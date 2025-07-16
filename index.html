@@ -25,7 +25,7 @@
       width: 120px;
       height: 300px;
       transform-origin: bottom center;
-      transition: transform 0.5s ease;
+      transition: left 1s ease;
     }
 
     .cabeca {
@@ -78,9 +78,58 @@
       opacity: 0.6;
     }
 
+    .caminhada .braco.esq {
+      animation: bracoEsq 0.5s infinite alternate;
+    }
+
+    .caminhada .braco.dir {
+      animation: bracoDir 0.5s infinite alternate;
+    }
+
+    .caminhada .perna.esq {
+      animation: pernaEsq 0.5s infinite alternate;
+    }
+
+    .caminhada .perna.dir {
+      animation: pernaDir 0.5s infinite alternate;
+    }
+
+    @keyframes bracoEsq {
+      from { transform: rotate(20deg); }
+      to { transform: rotate(-30deg); }
+    }
+
+    @keyframes bracoDir {
+      from { transform: rotate(-20deg); }
+      to { transform: rotate(30deg); }
+    }
+
+    @keyframes pernaEsq {
+      from { transform: rotate(-20deg); }
+      to { transform: rotate(20deg); }
+    }
+
+    @keyframes pernaDir {
+      from { transform: rotate(20deg); }
+      to { transform: rotate(-20deg); }
+    }
+
+    .peca-quebrada {
+      animation: voar 1s ease-out forwards;
+    }
+
+    @keyframes voar {
+      to {
+        transform: translate(100px, -100px) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
     button {
-      display: block;
-      margin: 20px auto;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
       padding: 15px 35px;
       font-size: 20px;
       background: crimson;
@@ -125,35 +174,46 @@
     const p1 = document.getElementById("player1");
     const p2 = document.getElementById("player2");
     const arena = document.getElementById("arena");
-
     const braco = document.getElementById("p1-braco-dir");
 
-    // Avança
+    // Inicia caminhada
+    p1.classList.add("caminhada");
     p1.style.left = "calc(100vw - 300px)";
 
     setTimeout(() => {
+      // Para de caminhar
+      p1.classList.remove("caminhada");
+
       // Anima o braço
       braco.style.transform = "rotate(-70deg)";
 
-      // Impacto
+      // Impacto visual
       const impacto = document.createElement("div");
       impacto.className = "impacto";
       impacto.style.left = "calc(100vw - 240px)";
       impacto.style.bottom = "140px";
       arena.appendChild(impacto);
 
-      // Player2 cai
-      p2.classList.add("caido");
+      // Boneco 2 quebra
+      const membrosP2 = p2.querySelectorAll(".membro, .cabeca, .tronco");
+      membrosP2.forEach(part => {
+        part.classList.add("peca-quebrada");
+      });
 
-      // Reset impacto
+      // Reset após impacto
       setTimeout(() => {
         arena.removeChild(impacto);
         braco.style.transform = "rotate(0)";
         p1.style.left = "100px";
       }, 1000);
 
-      // Player2 levanta
+      // Reconstroi o boneco 2
       setTimeout(() => {
+        membrosP2.forEach(part => {
+          part.classList.remove("peca-quebrada");
+          part.style.transform = "none";
+          part.style.opacity = "1";
+        });
         p2.classList.remove("caido");
       }, 3000);
     }, 1000);
